@@ -3,5 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "repository": "https://github.com/moodyRahman/reliquary-backend",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "nodemon": "^2.0.20"
+  }
 }
