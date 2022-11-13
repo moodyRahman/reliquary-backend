@@ -1,8 +1,15 @@
 import express from 'express'
-const app = express()
+const router = express.Router()
 
-app.get("/login", (req, res) => {
+router.post("/login", (req, res) => {
+    const { username, password } = req.body
+    console.log(username, password)
+
     res.send("loggin in now")
 })
 
-export {app as authModule}
+router.get("/", (req, res) => {
+    res.send("auth module online")
+})
+
+export {router as authModule}
