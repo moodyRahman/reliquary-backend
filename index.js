@@ -6,7 +6,6 @@ import cors from "cors"
 import morgan from "morgan"
 import bodyParser from "body-parser"
 import { authModule } from "./routes/auth.js"
-import { log } from "./middleware/logger.js"
 
 
 dotenv.config({
@@ -28,9 +27,19 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 })
 
+app.use((err, req, res, next) => {
+    console.log(err)
+    const {status, message} = err;
+
+    return res.send({
+        status:status?status:500,
+        message:message?message:"internal server error, see logs"
+    })
+})
+
 mongoose.connect(process.env.MONGODB_URL).then(() => {
     console.log(`🤖 connected to mongodb`)
     app.listen(port, () => {
         console.log(`⚡ backend server at: http://localhost:${port}`)
-    })  
+    })
 })
