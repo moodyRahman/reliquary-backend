@@ -1,4 +1,9 @@
+
 import express from 'express'
+import * as jwt from "jsonwebtoken"
+import * as crypto from "crypto"
+import User from "../db/User.js"
+
 const router = express.Router()
 
 
@@ -18,17 +23,35 @@ const verifyCaptcha = async (req, res, next) => {
 }
 
 
-router.post("/login", verifyCaptcha, (req, res) => {
+router.post("/login", verifyCaptcha, (req, res, next) => {
     const { username, password } = req.body
     console.log(username, password)
 
     res.send("loggin in now")
 })
 
-router.post("/register", verifyCaptcha, async (req, res) => {
+router.post("/register", verifyCaptcha, async (req, res, next) => {
     const { username, password } = req.body
-    console.log(username, password)
-    res.send({status:200, message:"registered!"})
+
+    if (await User.exists({username:username})) {
+        return next({status:500, message:"user already exists"})
+    }
+
+
+
+    const user = new User();
+    
+    user.username = username
+    user.salt = crypto.randomBytes(64).toString("base64")
+    
+    const hash = crypto.createHash("sha256")
+    hash.update(password + user.salt)
+    user.hashed_password = hash.digest("hex")
+
+    await user.save()
+
+
+    res.send({status:201, message:"success", username:username})
 })
 
 
