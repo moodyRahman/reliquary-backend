@@ -1,6 +1,6 @@
 
 import express from 'express'
-import * as jwt from "jsonwebtoken"
+import * as jose from 'jose'
 import * as crypto from "crypto"
 import User from "../db/User.js"
 
@@ -8,7 +8,7 @@ const router = express.Router()
 
 
 const verifyCaptcha = async (req, res, next) => {
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress 
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
     const { token } = req.body
     const c_res = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${process.env.CAPTCHA_SECRET}&response=${token}&remoteip=${ip}`)
     const data = await c_res.json()
@@ -17,41 +17,68 @@ const verifyCaptcha = async (req, res, next) => {
         return next()
     }
     next({
-        status:500,
-        message:"bad captcha, are you a robot?"
+        status: 500,
+        message: "bad captcha, are you a robot?"
     })
 }
 
 
-router.post("/login", verifyCaptcha, (req, res, next) => {
-    const { username, password } = req.body
-    console.log(username, password)
+const generateJwt = async(payload, expiry) => {
+    const secret = new TextEncoder().encode(
+        `${process.env.JWT_SECRET}`
+    );
+    
+    return await new jose.SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setIssuer('urn:example:issuer')
+    .setAudience('urn:example:audience')
+    .setExpirationTime(expiry)
+    .sign(secret)
+}
 
-    res.send("loggin in now")
+
+
+router.post("/login", verifyCaptcha, async (req, res, next) => {
+    const { username, password } = req.body
+    const user = await User.findOne({ username: username })
+    if (!user) {
+        return next({ status: 500, message: "user not found" })
+    }
+
+    const hash = crypto.createHash("sha256")
+    const calculated_hash = hash.update(password + user.salt).digest("hex")
+
+    if (!(user.hashed_password === calculated_hash)) {
+        return res.send({ status: 500, message: "incorrect password" })
+    }
+
+    const refresh = await generateJwt({ username: username, type:"refresh" })
+    const access = await generateJwt({ username: username, type:"access" })
+
+    return res.send({ status: 200, message: "logged in!", refresh_token:refresh, access_token:access })
+
 })
 
 router.post("/register", verifyCaptcha, async (req, res, next) => {
     const { username, password } = req.body
 
-    if (await User.exists({username:username})) {
-        return next({status:500, message:"user already exists"})
+    if (await User.exists({ username: username })) {
+        return next({ status: 500, message: "user already exists" })
     }
 
-
-
     const user = new User();
-    
+
     user.username = username
     user.salt = crypto.randomBytes(64).toString("base64")
-    
+
     const hash = crypto.createHash("sha256")
     hash.update(password + user.salt)
     user.hashed_password = hash.digest("hex")
 
     await user.save()
 
-
-    res.send({status:201, message:"success", username:username})
+    res.send({ status: 201, message: "success", username: username })
 })
 
 
@@ -59,4 +86,4 @@ router.get("/", (req, res) => {
     res.send("auth module online")
 })
 
-export {router as authModule}
+export { router as authModule }
