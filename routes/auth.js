@@ -31,8 +31,8 @@ const generateJwt = async(payload, expiry) => {
     return await new jose.SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setIssuer('urn:example:issuer')
-    .setAudience('urn:example:audience')
+    .setIssuer('reliquary')
+    .setAudience(payload.username)
     .setExpirationTime(expiry)
     .sign(secret)
 }
@@ -53,9 +53,10 @@ router.post("/login", verifyCaptcha, async (req, res, next) => {
         return res.send({ status: 500, message: "incorrect password" })
     }
 
-    const refresh = await generateJwt({ username: username, type:"refresh" })
-    const access = await generateJwt({ username: username, type:"access" })
+    const refresh = await generateJwt({ username: username, type:"refresh" }, "30d")
+    const access = await generateJwt({ username: username, type:"access" }, "2h")
 
+    res.status(200)
     return res.send({ status: 200, message: "logged in!", refresh_token:refresh, access_token:access })
 
 })

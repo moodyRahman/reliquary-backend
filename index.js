@@ -17,7 +17,7 @@ const port = 3005
 
 app.use(express.json());
 app.use(morgan('dev'));
-app.use(cors())
+app.use(cors({origin: `${process.env.ORIGIN}`}))
 app.use(bodyParser.json())
 
 
@@ -31,6 +31,7 @@ app.use((err, req, res, next) => {
     console.log(err)
     const {status, message} = err;
 
+    res.status(status?status:500)
     return res.send({
         status:status?status:500,
         message:message?message:"internal server error, see logs"
