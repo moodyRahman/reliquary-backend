@@ -23,18 +23,18 @@ const verifyCaptcha = async (req, res, next) => {
 }
 
 
-const generateJwt = async(payload, expiry) => {
+const generateJwt = async (payload, expiry) => {
     const secret = new TextEncoder().encode(
         `${process.env.JWT_SECRET}`
     );
-    
+
     return await new jose.SignJWT(payload)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setIssuer('reliquary')
-    .setAudience(payload.username)
-    .setExpirationTime(expiry)
-    .sign(secret)
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setIssuer('reliquary')
+        .setAudience(payload.username)
+        .setExpirationTime(expiry)
+        .sign(secret)
 }
 
 
@@ -53,11 +53,11 @@ router.post("/login", verifyCaptcha, async (req, res, next) => {
         return res.send({ status: 500, message: "incorrect password" })
     }
 
-    const refresh = await generateJwt({ username: username, type:"refresh" }, "30d")
-    const access = await generateJwt({ username: username, type:"access" }, "2h")
+    const refresh = await generateJwt({ username: username, type: "refresh" }, "30d")
+    const access = await generateJwt({ username: username, type: "access" }, "2h")
 
     res.status(200)
-    return res.send({ status: 200, message: "logged in!", refresh_token:refresh, access_token:access })
+    return res.send({ status: 200, message: "logged in!", refresh_token: refresh, access_token: access, username:username })
 
 })
 
@@ -79,7 +79,10 @@ router.post("/register", verifyCaptcha, async (req, res, next) => {
 
     await user.save()
 
-    res.send({ status: 201, message: "success", username: username })
+    const refresh = await generateJwt({ username: username, type: "refresh" }, "30d")
+    const access = await generateJwt({ username: username, type: "access" }, "2h")
+
+    res.send({ status: 201, message: "success", username: username, refresh_token: refresh, access_token: access })
 })
 
 
