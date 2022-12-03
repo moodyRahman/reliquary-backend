@@ -6,6 +6,7 @@ import cors from "cors"
 import morgan from "morgan"
 import bodyParser from "body-parser"
 import { authModule } from "./routes/auth.js"
+import { debugModule } from './routes/debug.js'
 
 
 dotenv.config({
@@ -22,6 +23,7 @@ app.use(bodyParser.json())
 
 
 app.use("/auth", authModule)
+app.use("/debug", debugModule)
 
 app.get('/', (req, res) => {
     res.send('Hello World!')
