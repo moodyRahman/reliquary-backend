@@ -31,8 +31,8 @@ const generateJwt = async (payload, expiry) => {
     return await new jose.SignJWT(payload)
         .setProtectedHeader({ alg: 'HS256' })
         .setIssuedAt()
-        .setIssuer('reliquary')
-        .setAudience(payload.username)
+        .setIssuer('backend.reliquary.moodyrahman.com')
+        .setAudience("reliquary.moodyrahman.com")
         .setExpirationTime(expiry)
         .sign(secret)
 }
