@@ -34,6 +34,7 @@ const generateJwt = async (payload, expiry) => {
         .setIssuer('backend.reliquary.moodyrahman.com')
         .setAudience("reliquary.moodyrahman.com")
         .setExpirationTime(expiry)
+        .setSubject(payload.type)
         .sign(secret)
 }
 

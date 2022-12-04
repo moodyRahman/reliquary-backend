@@ -12,6 +12,7 @@ const verifyJWT = async (req, res, next) => {
         const { payload, protectedHeader } = await jose.jwtVerify(token, secret, {
             issuer: 'backend.reliquary.moodyrahman.com',
             audience: 'reliquary.moodyrahman.com',
+            subject:"access"
         })
         req.username = payload.username
         next()
