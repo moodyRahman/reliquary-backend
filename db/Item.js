@@ -11,4 +11,4 @@ const ItemSchema = new Schema({
 
 const Item = mongoose.model('Item', ItemSchema);
 
-export default Item
+export { Item, ItemSchema }

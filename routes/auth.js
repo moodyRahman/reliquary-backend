@@ -2,7 +2,7 @@
 import express from 'express'
 import * as jose from 'jose'
 import * as crypto from "crypto"
-import User from "../db/User.js"
+import { User } from "../db/index.js"
 
 const router = express.Router()
 
