@@ -1,6 +1,7 @@
 
 import mongoose from 'mongoose';
 import { ItemSchema } from "./Item.js"
+import { User } from './User.js';
 const { Schema } = mongoose;
 
 const CharacterSchema = new Schema({
@@ -12,6 +13,11 @@ const CharacterSchema = new Schema({
     rollers: String,
     id: Number,
 });
+
+// CharacterSchema.pre("remove", (next) => {
+//     const char = this;
+//     const users = User.find().populate()
+// })
 
 const Character = mongoose.model('Character', CharacterSchema);
 

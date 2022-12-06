@@ -1,6 +1,13 @@
 import * as jose from 'jose'
 
-
+/**
+ * 
+ * @param {request} req 
+ * @param {response} res 
+ * @param {next} next 
+ * verifies token in "token" section of JSON body
+ * modifies req to contain req.username of token owner
+ */
 const verifyJWT = async (req, res, next) => {
     const { token } = req.body
 
