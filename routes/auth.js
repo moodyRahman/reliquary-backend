@@ -3,6 +3,7 @@ import express from 'express'
 import * as jose from 'jose'
 import * as crypto from "crypto"
 import { User } from "../db/index.js"
+import { verifyJWT } from '../middleware.js'
 
 const router = express.Router()
 
@@ -38,6 +39,10 @@ const generateJwt = async (payload, expiry) => {
         .sign(secret)
 }
 
+
+router.post("/verify_token", verifyJWT, (req, res, next) => {
+    res.send({"status":200})
+})
 
 
 router.post("/login", verifyCaptcha, async (req, res, next) => {

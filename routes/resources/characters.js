@@ -50,7 +50,7 @@ router.post("/get", async (req, res, next) => {
 
     console.log(characters)
 
-    res.send("moody")
+    res.send(characters)
 
 })
 

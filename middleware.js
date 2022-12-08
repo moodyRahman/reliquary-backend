@@ -11,6 +11,13 @@ import * as jose from 'jose'
 const verifyJWT = async (req, res, next) => {
     const { token } = req.body
 
+    if (!token) {
+        next({
+            status:401,
+            message:"missing token in JSON body"
+        })
+    }
+
     const secret = new TextEncoder().encode(
         `${process.env.JWT_SECRET}`
     );
