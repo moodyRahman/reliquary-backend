@@ -40,17 +40,17 @@ router.post("/create", async (req, res, next) => {
 })
 
 router.post("/get", async (req, res, next) => {
+    console.log(req.username)
     const characters = await Character.find()
         .populate(
             {
                 path: "owner",
-                match: req.username,
+                match: {username:{$eq:req.username}},
                 select: "username -_id"
             })
 
-    console.log(characters)
-
-    res.send(characters)
+    
+    res.send(characters.filter(e => e.owner !== null))
 
 })
 
