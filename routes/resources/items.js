@@ -1,6 +1,6 @@
 import express from 'express'
 import { Character, Item } from "../../db/index.js"
-import { verifyJWT } from '../../middleware.js'
+import { verifyJSONBody, verifyJWT } from '../../middleware.js'
 
 const router = express.Router()
 
@@ -10,7 +10,7 @@ router.get("/", (req, res, next) => {
 
 router.use(verifyJWT)
 
-router.post("/get", async (req, res, next) => {
+router.post("/create", verifyJSONBody(["name", "description", "tags"]), async (req, res, next) => {
     const { name, description, tags } = req.body
 
     const c = await Character.findById(res.locals.id)

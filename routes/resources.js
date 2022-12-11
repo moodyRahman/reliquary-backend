@@ -11,17 +11,15 @@ router.get("/", (req, res, next) => {
     res.send("resource module online")
 })
 
-
-// every route after this line enforces tokens
 router.use("/character", characterController)
 
+// binds the dynamic url segment to the lifetime of the request
 router.use("/:id/items", (req, res, next) => {
-    console.log(req.params.id)
     res.locals.id = req.params.id
     next()
 })
-
 router.use("/:id/items", itemController)
+
 
 router.get("/kill", async (req, res, next) => {
     if (process.env.NODE_ENV == "dev") {
