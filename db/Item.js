@@ -5,6 +5,7 @@ const { Schema } = mongoose;
 const ItemSchema = new Schema({
     name: String,
     description: String,
+    tags:[String],
     id: Number,
     public: Boolean
 });

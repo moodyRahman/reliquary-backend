@@ -1,4 +1,5 @@
 import express from 'express'
+import { Character, Item } from "../../db/index.js"
 import { verifyJWT } from '../../middleware.js'
 
 const router = express.Router()
@@ -9,9 +10,18 @@ router.get("/", (req, res, next) => {
 
 router.use(verifyJWT)
 
-router.post("/get", (req, res, next) => {
+router.post("/get", async (req, res, next) => {
+    const { name, description, tags } = req.body
 
-    res.send(res.locals.id)
+    const c = await Character.findById(res.locals.id)
+    const i = Item({
+        name:name,
+        description:description,
+        tags:tags
+    })
+    c.items.push(i)
+    c.save()
+    res.send(c)
 })
 
 export { router as itemController }
