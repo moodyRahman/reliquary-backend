@@ -1,5 +1,5 @@
 import express from 'express'
-import { verifyJWT } from '../../middleware.js'
+import { verifyJWT, verifyJSONBody } from '../../middleware.js'
 import { Character, User } from "../../db/index.js"
 import { CharacterSchema } from '../../db/Character.js'
 const router = express.Router()
@@ -13,7 +13,7 @@ router.get("/", (req, res, next) => {
 // every route after this line enforces tokens
 router.use(verifyJWT)
 
-router.post("/create", async (req, res, next) => {
+router.post("/create", verifyJSONBody(["name", "class", "description"]), async (req, res, next) => {
     const { name, class: c, description } = req.body
 
     const user = await User.findOne({ username: req.username })
